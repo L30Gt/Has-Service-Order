@@ -13,34 +13,107 @@ namespace OsDsII.api.Data
         public DbSet<Comment> Comments { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            //Criacao tabela Customer
             modelBuilder.Entity<Customer>()
-                .HasIndex(customer => customer.Email)
+                .ToTable("customer");
+            
+            modelBuilder.Entity<Customer>()
+                .HasKey(c => c.Id); //Tem chave primaria
+            
+            modelBuilder.Entity<Customer>()
+                .HasIndex(c => c.Email)
                 .IsUnique();
+            
+            modelBuilder.Entity<Customer>()
+                .Property(c => c.Id)
+                .ValueGeneratedOnAdd(); //auto incremento de chave primária
+            
+            modelBuilder.Entity<Customer>()
+                .Property(c => c.Name)
+                .HasMaxLength(60)
+                .IsRequired();
+            
+            modelBuilder.Entity<Customer>()
+                .Property(c => c.Email)
+                .HasMaxLength(255)
+                .IsRequired();
+
+            modelBuilder.Entity<Customer>()
+                .Property(c => c.Phone)
+                .HasMaxLength(20);
+
+            //Criacao tabela ServiceOrder
+            modelBuilder.Entity<ServiceOrder>()
+                .ToTable("service_order");
 
             modelBuilder.Entity<ServiceOrder>()
-                .HasOne(entity => entity.Customer)
-                .WithMany(c => c.ServiceOrders)
+                .HasKey(s => s.Id);
+
+            modelBuilder.Entity<ServiceOrder>()
+                .Property(s => s.Id)
+                .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<ServiceOrder>()
+                .Property(s => s.Description)
+                .IsRequired(); //NOT NULL
+
+            modelBuilder.Entity<ServiceOrder>()
+                .Property(s => s.Price)
                 .IsRequired();
 
             modelBuilder.Entity<ServiceOrder>()
-                .HasMany(service => service.Comments)
-                .WithOne(e => e.ServiceOrder)
-                .HasForeignKey(entity => entity.ServiceOrderId)
-                .IsRequired();
+                .Property(s => s.Status)
+                .HasConversion(
+                new EnumToStringConverter<StatusServiceOrder>() //Converte o enum para string
+                );
 
             modelBuilder.Entity<ServiceOrder>()
-                .Property(serviceOrder => serviceOrder.Status)
-                .HasConversion(new EnumToStringConverter<StatusServiceOrder>());
-
+                .Property(s => s.OpeningDate)
+                .HasDefaultValue(DateTimeOffset.Now);
+                // .HasDefaultValueSql("getdate()"); ou .HasDefaultValue(DateTimeOffset.Now);
 
             modelBuilder.Entity<ServiceOrder>()
-                .Property(serviceOrder => serviceOrder.FinishDate)
+                .Property(s => s.FinishDate)
                 .HasDefaultValue(null);
 
+            //Para chave estrangeira 1/N
             modelBuilder.Entity<ServiceOrder>()
-                .Property(serviceOrder => serviceOrder.OpeningDate)
+                .HasOne(s => s.Customer)
+                .WithMany(e => e.ServiceOrders)
+                .IsRequired();
+
+            modelBuilder.Entity<ServiceOrder>()
+                .HasMany(s => s.Comments)
+                .WithOne(e => e.ServiceOrder)
+                .HasForeignKey(e => e.ServiceOrderId)
+                .IsRequired();
+
+            //Tabela Comments
+            modelBuilder.Entity<Comment>()
+                .ToTable("comentario");
+
+            modelBuilder.Entity<Comment>()
+                .HasKey(c => c.Id);
+
+            modelBuilder.Entity<Comment>()
+                .Property(c => c.Id)
+                .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<Comment>()
+                .Property(c => c.Description)
+                .HasColumnType("text")
+                .IsRequired();
+
+            modelBuilder.Entity<Comment>()
+                .Property(c => c.SendDate)
                 .HasDefaultValue(DateTimeOffset.Now);
 
+            //Chave estrangeira
+            modelBuilder.Entity<Comment>()
+                .HasOne(c => c.ServiceOrder)
+                .WithMany(e => e.Comments)
+                .HasForeignKey(e => e.ServiceOrderId)
+                .IsRequired();
         }
     }
 }
