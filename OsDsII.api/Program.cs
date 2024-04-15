@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using OsDsII.api.Data;
+using OsDsII.api.Repository.Comments;
 using OsDsII.api.Repository.Customers;
 using OsDsII.api.Repository.ServiceOrders;
 
@@ -17,6 +18,7 @@ builder.Services.AddCors();
 
 builder.Services.AddScoped<IServiceOrderRepository, ServiceOrderRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 
 
 builder.Services.AddControllers();

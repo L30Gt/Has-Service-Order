@@ -25,6 +25,20 @@ namespace OsDsII.api.Repository.ServiceOrders
         {
             return await _dataContext.ServiceOrders.FirstOrDefaultAsync(s => s.Id == id);
         }
+        public async Task<ServiceOrder> GetServiceOrderWithCommentsAsync(int serviceOrderId)
+        {
+            return await _dataContext.ServiceOrders
+                .Include(c => c.Customer)
+                .Include(c => c.Comments)
+                .FirstOrDefaultAsync(s => s.Id == serviceOrderId);
+        }
+
+        public async Task<ServiceOrder> GetServiceOrderFromCustomerAsync(int serviceOrderId)
+        {
+            return await _dataContext.ServiceOrders
+                .Include(c => c.Customer)
+                .FirstOrDefaultAsync(s => serviceOrderId == s.Id);
+        }
 
         public async Task AddAsync(ServiceOrder serviceOrder)
         {
@@ -43,5 +57,6 @@ namespace OsDsII.api.Repository.ServiceOrders
             _dataContext.ServiceOrders.Update(serviceOrder);
             await _dataContext.SaveChangesAsync();
         }
+
     }
 }
