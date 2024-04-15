@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OsDsII.api.Data;
 using OsDsII.api.Models;
-using OsDsII.api.Repository;
+using OsDsII.api.Repository.Customers;
+using OsDsII.api.Repository.ServiceOrders;
 
 namespace OsDsII.api.Controllers
 {
@@ -11,9 +12,12 @@ namespace OsDsII.api.Controllers
     public class ServiceOrdersController : ControllerBase
     {
         private readonly IServiceOrderRepository _serviceOrderRepository; //IOC (Inversion of Control)
-        public ServiceOrdersController(IServiceOrderRepository serviceOrderRepository)
+        private readonly ICustomerRepository _customerRepository;
+
+        public ServiceOrdersController(IServiceOrderRepository serviceOrderRepository, ICustomerRepository customerRepository)
         {
             _serviceOrderRepository = serviceOrderRepository;
+            _customerRepository = customerRepository;
         }
 
         [HttpGet]
@@ -67,7 +71,7 @@ namespace OsDsII.api.Controllers
                     return BadRequest("Service order cannot be null");
                 }
 
-                Customer customer = await _dataContext.Customers.FirstOrDefaultAsync(c => serviceOrder.Customer.Id == c.Id);
+                Customer customer = await _customerRepository.GetByIdAsync(serviceOrder.Customer.Id);
 
                 if (customer is null)
                 {

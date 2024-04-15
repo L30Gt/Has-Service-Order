@@ -1,6 +1,6 @@
 ﻿using OsDsII.api.Models;
 
-namespace OsDsII.api.Repository
+namespace OsDsII.api.Repository.ServiceOrders
 {
     // Dependency inversion principle (solid)
     public interface IServiceOrderRepository

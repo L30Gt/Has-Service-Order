@@ -3,7 +3,7 @@ using OsDsII.api.Controllers;
 using OsDsII.api.Data;
 using OsDsII.api.Models;
 
-namespace OsDsII.api.Repository
+namespace OsDsII.api.Repository.ServiceOrders
 {
     public sealed class ServiceOrderRepository : IServiceOrderRepository
     {

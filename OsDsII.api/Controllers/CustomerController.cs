@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OsDsII.api.Data;
 using OsDsII.api.Models;
+using OsDsII.api.Repository.Customers;
 
 namespace OsDsII.api.Controllers
 {
@@ -9,10 +10,10 @@ namespace OsDsII.api.Controllers
     [Route("[controller]")]
     public class CustomersController : ControllerBase
     {
-        private readonly DataContext _dataContext;
-        public CustomersController(DataContext dataContext)
+        private readonly ICustomerRepository _customerRepository;
+        public CustomersController(ICustomerRepository customerRepository)
         {
-            _dataContext = dataContext;
+            _customerRepository = customerRepository;
         }
 
         [HttpGet]
@@ -22,7 +23,7 @@ namespace OsDsII.api.Controllers
         {
             try
             {
-                List<Customer> customers = await _dataContext.Customers.ToListAsync();
+                List<Customer> customers = await _customerRepository.GetAllAsync();
                 return Ok(customers);
             }
             catch (Exception ex)
@@ -39,7 +40,7 @@ namespace OsDsII.api.Controllers
         {
             try
             {
-                Customer customer = await _dataContext.Customers.FirstOrDefaultAsync(c => c.Id == id);
+                Customer customer = await _customerRepository.GetByIdAsync(id);
                 if (customer is null)
                 {
                     return NotFound("Customer not found");
@@ -60,14 +61,12 @@ namespace OsDsII.api.Controllers
         {
             try
             {
-                Customer customerExists = await _dataContext.Customers.FirstOrDefaultAsync(c => c.Email == customer.Email);
+                Customer customerExists = await _customerRepository.GetCustomerByEmailAsync(customer.Email);
                 if (customerExists != null && !customerExists.Equals(customer))
                 {
                     return Conflict("Customer already exists");
                 }
-                await _dataContext.Customers.AddAsync(customer);
-                await _dataContext.SaveChangesAsync();
-
+                await _customerRepository.AddCustomerAsync(customer);
                 return Created(nameof(CustomersController), customer);
             }
             catch (Exception ex)
@@ -84,12 +83,12 @@ namespace OsDsII.api.Controllers
         {
             try
             {
-                Customer customer = await _dataContext.Customers.FirstOrDefaultAsync(c => c.Id == id);
+                Customer customer = await _customerRepository.GetByIdAsync(id);
                 if (customer is null)
                 {
                     return NotFound("Customer not found");
                 }
-                _dataContext.Customers.Remove(customer);
+                await _customerRepository.DeleteCustomerAsync(customer);
                 return NoContent();
             }
             catch (Exception ex)
@@ -106,13 +105,13 @@ namespace OsDsII.api.Controllers
         {
             try
             {
-                Customer currentCustomer = await _dataContext.Customers.FirstOrDefaultAsync(c => c.Id == customer.Id);
+                Customer currentCustomer = await _customerRepository.GetByIdAsync(customer.Id);
                 if (customer is null)
                 {
                     return NotFound("Customer not found");
                 }
-                _dataContext.Customers.Update(customer);
-                await _dataContext.SaveChangesAsync();
+
+                await _customerRepository.UpdateCustomerAsync(customer);
                 return NoContent();
             }
             catch (Exception ex)
