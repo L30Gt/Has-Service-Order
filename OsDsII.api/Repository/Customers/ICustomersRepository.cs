@@ -2,7 +2,7 @@
 
 namespace OsDsII.api.Repository.Customers
 {
-    public interface ICustomerRepository
+    public interface ICustomersRepository
     {
         public Task<List<Customer>> GetAllAsync();
         public Task<Customer> GetByIdAsync(int id);

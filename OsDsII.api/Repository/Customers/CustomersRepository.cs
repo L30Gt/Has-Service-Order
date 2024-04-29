@@ -5,11 +5,11 @@ using OsDsII.api.Models;
 
 namespace OsDsII.api.Repository.Customers
 {
-    public sealed class CustomerRepository : ICustomerRepository
+    public sealed class CustomersRepository : ICustomersRepository
     {
         private readonly DataContext _dataContext;
 
-        public CustomerRepository(DataContext dataContext)
+        public CustomersRepository(DataContext dataContext)
         {
             _dataContext = dataContext;
         }

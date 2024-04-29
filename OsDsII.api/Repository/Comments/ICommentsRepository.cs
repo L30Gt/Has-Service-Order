@@ -2,7 +2,7 @@
 
 namespace OsDsII.api.Repository.Comments
 {
-    public interface ICommentRepository
+    public interface ICommentsRepository
     {
         public Task AddCommentAsync(Comment comment);
 

@@ -5,11 +5,11 @@ using OsDsII.api.Models;
 
 namespace OsDsII.api.Repository.Comments
 {
-    public sealed class CommentRepository : ICommentRepository
+    public sealed class CommentsRepository : ICommentsRepository
     {
         private readonly DataContext _dataContext;
 
-        public CommentRepository(DataContext dataContext)
+        public CommentsRepository(DataContext dataContext)
         {
             _dataContext = dataContext;
         }

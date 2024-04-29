@@ -12,10 +12,10 @@ namespace OsDsII.api.Controllers
     [Route("ServiceOrders/{id}/comment")]
     public class CommentController : ControllerBase
     {
-        private readonly ICommentRepository _commentRepository;
+        private readonly ICommentsRepository _commentRepository;
         private readonly IServiceOrderRepository _serviceOrderRepository;
 
-        public CommentController(ICommentRepository commentRepository, IServiceOrderRepository serviceOrderRepository)
+        public CommentController(ICommentsRepository commentRepository, IServiceOrderRepository serviceOrderRepository)
         {
             _commentRepository = commentRepository;
             _serviceOrderRepository = serviceOrderRepository;

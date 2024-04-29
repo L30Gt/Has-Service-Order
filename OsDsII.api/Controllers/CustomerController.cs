@@ -1,8 +1,12 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OsDsII.api.Data;
+using OsDsII.api.Dtos;
+using OsDsII.api.Exceptions;
 using OsDsII.api.Models;
 using OsDsII.api.Repository.Customers;
+using OsDsII.api.Services.Customers;
 
 namespace OsDsII.api.Controllers
 {
@@ -10,10 +14,15 @@ namespace OsDsII.api.Controllers
     [Route("[controller]")]
     public class CustomersController : ControllerBase
     {
-        private readonly ICustomerRepository _customerRepository;
-        public CustomersController(ICustomerRepository customerRepository)
+        private readonly ICustomersRepository _customerRepository;
+        private readonly IMapper _mapper;
+        private readonly ICustomersService _customersService;
+
+        public CustomersController(ICustomersRepository customerRepository, IMapper mapper, ICustomersService customersService)
         {
             _customerRepository = customerRepository;
+            _mapper = mapper;
+            _customersService = customersService;
         }
 
         [HttpGet]
@@ -57,21 +66,17 @@ namespace OsDsII.api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Customer))]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> CreateCustomerAsync(Customer customer)
+        public async Task<IActionResult> CreateCustomerAsync(CreateCustomerDto customer)
         {
             try
             {
-                Customer customerExists = await _customerRepository.GetCustomerByEmailAsync(customer.Email);
-                if (customerExists != null && !customerExists.Equals(customer))
-                {
-                    return Conflict("Customer already exists");
-                }
-                await _customerRepository.AddCustomerAsync(customer);
+                await _customersService.CreateAsync(customer); //assíncrono porém void
+
                 return Created(nameof(CustomersController), customer);
             }
-            catch (Exception ex)
+            catch (BaseException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return ex.GetResponse();
             }
         }
 

@@ -12,9 +12,9 @@ namespace OsDsII.api.Controllers
     public class ServiceOrdersController : ControllerBase
     {
         private readonly IServiceOrderRepository _serviceOrderRepository; //IOC (Inversion of Control)
-        private readonly ICustomerRepository _customerRepository;
+        private readonly ICustomersRepository _customerRepository;
 
-        public ServiceOrdersController(IServiceOrderRepository serviceOrderRepository, ICustomerRepository customerRepository)
+        public ServiceOrdersController(IServiceOrderRepository serviceOrderRepository, ICustomersRepository customerRepository)
         {
             _serviceOrderRepository = serviceOrderRepository;
             _customerRepository = customerRepository;
