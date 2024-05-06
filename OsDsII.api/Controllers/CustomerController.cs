@@ -32,12 +32,12 @@ namespace OsDsII.api.Controllers
         {
             try
             {
-                List<Customer> customers = await _customerRepository.GetAllAsync();
+                IEnumerable<CustomerDto> customers = await _customersService.GetAllAsync();
                 return Ok(customers);
             }
-            catch (Exception ex)
+            catch (BaseException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return ex.GetResponse();
             }
         }
 
@@ -49,16 +49,12 @@ namespace OsDsII.api.Controllers
         {
             try
             {
-                Customer customer = await _customerRepository.GetByIdAsync(id);
-                if (customer is null)
-                {
-                    return NotFound("Customer not found");
-                }
+                CustomerDto customer = await _customersService.GetByIdAsync(id);
                 return Ok(customer);
             }
-            catch (Exception ex)
+            catch (BaseException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return ex.GetResponse();
             }
         }
 

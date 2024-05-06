@@ -14,7 +14,7 @@ namespace OsDsII.api.Repository.Customers
             _dataContext = dataContext;
         }
 
-        public async Task<List<Customer>> GetAllAsync()
+        public async Task<IEnumerable<Customer>> GetAllAsync()
         {
             return await _dataContext.Customers.ToListAsync();
         }

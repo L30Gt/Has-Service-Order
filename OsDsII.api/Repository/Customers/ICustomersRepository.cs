@@ -4,7 +4,7 @@ namespace OsDsII.api.Repository.Customers
 {
     public interface ICustomersRepository
     {
-        public Task<List<Customer>> GetAllAsync();
+        public Task<IEnumerable<Customer>> GetAllAsync();
         public Task<Customer> GetByIdAsync(int id);
         public Task<Customer> GetCustomerByEmailAsync(string email);
         public Task AddCustomerAsync(Customer customer);

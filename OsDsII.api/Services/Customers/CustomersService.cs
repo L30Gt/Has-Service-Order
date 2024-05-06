@@ -29,5 +29,24 @@ namespace OsDsII.api.Services.Customers
 
             await _customersRepository.AddCustomerAsync(customer);
         }
+
+        public async Task<IEnumerable<CustomerDto>> GetAllAsync()
+        {
+            IEnumerable<Customer> customers = await _customersRepository.GetAllAsync();
+            var customersDto = _mapper.Map<IEnumerable<CustomerDto>>(customers);
+            return customersDto;
+        }
+
+        public async Task<CustomerDto> GetByIdAsync(int id)
+        {
+            Customer customer = await _customersRepository.GetByIdAsync(id);
+            if (customer is null)
+            {
+                throw new NotFoundException("Customer not found");
+            }
+
+            var customerDto = _mapper.Map<CustomerDto>(customer);
+            return customerDto;
+        }
     }
 }
