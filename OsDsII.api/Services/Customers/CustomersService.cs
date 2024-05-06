@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using OsDsII.api.Dtos;
 using OsDsII.api.Exceptions;
 using OsDsII.api.Models;
@@ -15,19 +16,6 @@ namespace OsDsII.api.Services.Customers
         {
             _customersRepository = customersRepository;
             _mapper = mapper;
-        }
-
-        public async Task CreateAsync(CreateCustomerDto customerDto)
-        {
-            var customer = _mapper.Map<Customer>(customerDto);
-
-            var customerExists = await _customersRepository.GetCustomerByEmailAsync(customer.Email);
-            if (customerExists != null && !customerExists.Equals(customer))
-            {
-                throw new ConflictException("Customer already exists");
-            }
-
-            await _customersRepository.AddCustomerAsync(customer);
         }
 
         public async Task<IEnumerable<CustomerDto>> GetAllAsync()
@@ -47,6 +35,45 @@ namespace OsDsII.api.Services.Customers
 
             var customerDto = _mapper.Map<CustomerDto>(customer);
             return customerDto;
+        }
+
+        public async Task CreateAsync(CreateCustomerDto customerDto)
+        {
+            var customer = _mapper.Map<Customer>(customerDto);
+
+            var customerExists = await _customersRepository.GetCustomerByEmailAsync(customer.Email);
+            if (customerExists != null && !customerExists.Equals(customer))
+            {
+                throw new ConflictException("Customer already exists");
+            }
+
+            await _customersRepository.AddCustomerAsync(customer);
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            Customer customer = await _customersRepository.GetByIdAsync(id);
+            if (customer is null)
+            {
+                throw new NotFoundException("Customer not found");
+            }
+
+            await _customersRepository.DeleteCustomerAsync(customer);
+        }
+
+        public async Task UpdateAsync(int id, CreateCustomerDto customer)
+        {
+            Customer customerExists = await _customersRepository.GetByIdAsync(id);
+            if (customerExists is null)
+            {
+                throw new NotFoundException("Customer not found");
+            }
+
+            customerExists.Name = customer.Name;
+            customerExists.Email = customer.Email;
+            customerExists.Phone = customer.Phone;
+
+            await _customersRepository.UpdateCustomerAsync(customerExists);
         }
     }
 }

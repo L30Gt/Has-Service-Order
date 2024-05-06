@@ -84,17 +84,13 @@ namespace OsDsII.api.Controllers
         {
             try
             {
-                Customer customer = await _customerRepository.GetByIdAsync(id);
-                if (customer is null)
-                {
-                    return NotFound("Customer not found");
-                }
-                await _customerRepository.DeleteCustomerAsync(customer);
+                await _customersService.DeleteAsync(id);
+                
                 return NoContent();
             }
-            catch (Exception ex)
+            catch (BaseException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return ex.GetResponse();
             }
         }
 
@@ -102,17 +98,12 @@ namespace OsDsII.api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateCustomerAsync(Customer customer)
+        public async Task<IActionResult> UpdateCustomerAsync(int id, CreateCustomerDto customer)
         {
             try
             {
-                Customer currentCustomer = await _customerRepository.GetByIdAsync(customer.Id);
-                if (customer is null)
-                {
-                    return NotFound("Customer not found");
-                }
+                await _customersService.UpdateAsync(id, customer);
 
-                await _customerRepository.UpdateCustomerAsync(customer);
                 return NoContent();
             }
             catch (Exception ex)
