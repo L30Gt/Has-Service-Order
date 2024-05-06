@@ -14,14 +14,10 @@ namespace OsDsII.api.Controllers
     [Route("[controller]")]
     public class CustomersController : ControllerBase
     {
-        private readonly ICustomersRepository _customerRepository;
-        private readonly IMapper _mapper;
         private readonly ICustomersService _customersService;
 
-        public CustomersController(ICustomersRepository customerRepository, IMapper mapper, ICustomersService customersService)
+        public CustomersController(ICustomersService customersService)
         {
-            _customerRepository = customerRepository;
-            _mapper = mapper;
             _customersService = customersService;
         }
 
