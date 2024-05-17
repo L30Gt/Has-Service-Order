@@ -69,28 +69,16 @@ namespace OsDsII.api.Data
 
             modelBuilder.Entity<ServiceOrder>()
                 .Property(s => s.OpeningDate)
-                .HasDefaultValue(DateTimeOffset.Now);
+                .HasDefaultValueSql("getdate()");
                 // .HasDefaultValueSql("getdate()"); ou .HasDefaultValue(DateTimeOffset.Now);
 
             modelBuilder.Entity<ServiceOrder>()
                 .Property(s => s.FinishDate)
                 .HasDefaultValue(null);
 
-            //Para chave estrangeira 1/N
-            modelBuilder.Entity<ServiceOrder>()
-                .HasOne(s => s.Customer)
-                .WithMany(e => e.ServiceOrders)
-                .IsRequired();
-
-            modelBuilder.Entity<ServiceOrder>()
-                .HasMany(s => s.Comments)
-                .WithOne(e => e.ServiceOrder)
-                .HasForeignKey(e => e.ServiceOrderId)
-                .IsRequired();
-
             //Tabela Comments
             modelBuilder.Entity<Comment>()
-                .ToTable("comentario");
+                .ToTable("comments");
 
             modelBuilder.Entity<Comment>()
                 .HasKey(c => c.Id);
@@ -108,12 +96,19 @@ namespace OsDsII.api.Data
                 .Property(c => c.SendDate)
                 .HasDefaultValue(DateTimeOffset.Now);
 
+            //chave estrangeira 1/N
+            modelBuilder.Entity<ServiceOrder>()
+                .HasOne(s => s.Customer)
+                .WithMany(e => e.ServiceOrders)
+                .HasForeignKey(o => o.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             //Chave estrangeira
             modelBuilder.Entity<Comment>()
                 .HasOne(c => c.ServiceOrder)
                 .WithMany(e => e.Comments)
                 .HasForeignKey(e => e.ServiceOrderId)
-                .IsRequired();
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
