@@ -9,8 +9,8 @@ namespace OsDsII.api.Exceptions
                 (
                 "HSO-002", // código identificador de erros
                 message,
-                HttpStatusCode.Conflict,
-                StatusCodes.Status409Conflict,
+                HttpStatusCode.NotFound,
+                StatusCodes.Status404NotFound,
                 null,
                 DateTimeOffset.UtcNow,
                 null
