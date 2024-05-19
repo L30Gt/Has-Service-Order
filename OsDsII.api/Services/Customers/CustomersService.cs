@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using OsDsII.api.Dtos;
+using OsDsII.api.Dtos.Customers;
 using OsDsII.api.Exceptions;
 using OsDsII.api.Models;
 using OsDsII.api.Repository.Customers;
