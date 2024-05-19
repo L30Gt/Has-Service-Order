@@ -4,6 +4,7 @@ using OsDsII.api.Repository.Comments;
 using OsDsII.api.Repository.Customers;
 using OsDsII.api.Repository.ServiceOrders;
 using OsDsII.api.Services.Customers;
+using OsDsII.api.Services.ServiceOrders;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
@@ -22,6 +23,7 @@ builder.Services.AddScoped<ICustomersRepository, CustomersRepository>();
 builder.Services.AddScoped<ICommentsRepository, CommentsRepository>();
 
 builder.Services.AddScoped<ICustomersService, CustomersService>();
+builder.Services.AddScoped<IServiceOrderService, ServiceOrderService>();
 
 builder.Services.AddAutoMapper(typeof(Program));
 
