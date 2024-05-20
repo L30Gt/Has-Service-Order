@@ -1,39 +1,35 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using OsDsII.api.Data;
-using OsDsII.api.Models;
-using OsDsII.api.Repository.Comments;
-using OsDsII.api.Repository.ServiceOrders;
+using OsDsII.api.Dtos.Comments;
+using OsDsII.api.Exceptions;
+using OsDsII.api.Services.Comments;
 
 namespace OsDsII.api.Controllers
 {
-
     [ApiController]
     [Route("ServiceOrders/{id}/comment")]
     public class CommentController : ControllerBase
     {
-        private readonly ICommentsRepository _commentRepository;
-        private readonly IServiceOrderRepository _serviceOrderRepository;
+        private readonly ICommentService _commentService;
 
-        public CommentController(ICommentsRepository commentRepository, IServiceOrderRepository serviceOrderRepository)
+        public CommentController(ICommentService commentService)
         {
-            _commentRepository = commentRepository;
-            _serviceOrderRepository = serviceOrderRepository;
+            _commentService = commentService;
         }
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetCommentsAsync(int serviceOrderId)
+        public async Task<IActionResult> GetCommentsAsync(int id)
         {
             try
             {
-                ServiceOrder serviceOrderWithComments = await _serviceOrderRepository.GetServiceOrderWithCommentsAsync(serviceOrderId);
-                return Ok(serviceOrderWithComments);
+                var serviceOrderDto = await _commentService.GetByIdAsync(id);
+
+                return Ok(serviceOrderDto);
             }
-            catch (Exception ex)
+            catch (BaseException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return ex.GetResponse();
             }
 
         }
@@ -42,38 +38,18 @@ namespace OsDsII.api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> AddComment(int serviceOrderId, Comment comment)
+        public async Task<IActionResult> AddComment(int id, CreateCommentDto createCommentDto)
         {
             try
             {
-                var os = await _serviceOrderRepository.GetServiceOrderFromCustomerAsync(serviceOrderId);
+                var commentDto = await _commentService.AddAsync(id, createCommentDto);
 
-                if (os == null)
-                {
-                    return NotFound("ServiceOrder not found.");
-                }
-
-                Comment commentExists = HandleCommentObject(serviceOrderId, comment.Description);
-
-                await _commentRepository.AddCommentAsync(commentExists);
-
-                return Created(nameof(CommentController), commentExists);
+                return Created(nameof(CommentController), commentDto);
             }
-            catch (Exception ex)
+            catch (BaseException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return ex.GetResponse();
             }
-        }
-
-        private Comment HandleCommentObject(int id, string description)
-        {
-            Comment comment = new Comment
-            {
-                Description = description,
-                ServiceOrderId = id
-            };
-            return comment;
         }
     }
 }
-

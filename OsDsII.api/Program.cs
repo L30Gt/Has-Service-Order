@@ -3,6 +3,7 @@ using OsDsII.api.Data;
 using OsDsII.api.Repository.Comments;
 using OsDsII.api.Repository.Customers;
 using OsDsII.api.Repository.ServiceOrders;
+using OsDsII.api.Services.Comments;
 using OsDsII.api.Services.Customers;
 using OsDsII.api.Services.ServiceOrders;
 
@@ -24,6 +25,7 @@ builder.Services.AddScoped<ICommentsRepository, CommentsRepository>();
 
 builder.Services.AddScoped<ICustomersService, CustomersService>();
 builder.Services.AddScoped<IServiceOrderService, ServiceOrderService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
 
 builder.Services.AddAutoMapper(typeof(Program));
 
