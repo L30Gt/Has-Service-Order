@@ -11,38 +11,36 @@ namespace OsDsII.api.Data
         public DbSet<ServiceOrder> ServiceOrders { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Comment> Comments { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //Criacao tabela Customer
             modelBuilder.Entity<Customer>()
                 .ToTable("customer");
-            
+
             modelBuilder.Entity<Customer>()
-                .HasKey(c => c.Id); //Tem chave primaria
-            
+                .HasKey(c => c.Id);
+
             modelBuilder.Entity<Customer>()
                 .HasIndex(c => c.Email)
                 .IsUnique();
-            
+
             modelBuilder.Entity<Customer>()
                 .Property(c => c.Id)
-                .ValueGeneratedOnAdd(); //auto incremento de chave primária
-            
+                .ValueGeneratedOnAdd();
+
             modelBuilder.Entity<Customer>()
                 .Property(c => c.Name)
-                .HasMaxLength(60)
-                .IsRequired();
-            
+                .HasMaxLength(60);
+
             modelBuilder.Entity<Customer>()
                 .Property(c => c.Email)
-                .HasMaxLength(255)
-                .IsRequired();
+                .HasMaxLength(255);
 
             modelBuilder.Entity<Customer>()
                 .Property(c => c.Phone)
                 .HasMaxLength(20);
 
-            //Criacao tabela ServiceOrder
+            // Service Order
             modelBuilder.Entity<ServiceOrder>()
                 .ToTable("service_order");
 
@@ -55,28 +53,41 @@ namespace OsDsII.api.Data
 
             modelBuilder.Entity<ServiceOrder>()
                 .Property(s => s.Description)
-                .IsRequired(); //NOT NULL
+                .IsRequired();
 
             modelBuilder.Entity<ServiceOrder>()
                 .Property(s => s.Price)
-                .IsRequired();
+                .IsRequired(); //required significa NOT NULL por debaixo dos panos
 
             modelBuilder.Entity<ServiceOrder>()
                 .Property(s => s.Status)
                 .HasConversion(
-                new EnumToStringConverter<StatusServiceOrder>() //Converte o enum para string
+                new EnumToStringConverter<StatusServiceOrder>() //converte o enum em string
                 );
 
             modelBuilder.Entity<ServiceOrder>()
                 .Property(s => s.OpeningDate)
-                .HasDefaultValueSql("getdate()");
-                // .HasDefaultValueSql("getdate()"); ou .HasDefaultValue(DateTimeOffset.Now);
+                .HasDefaultValue(DateTimeOffset.Now);
+            //.HasDefaultValueSql("getdate()");
+            // ou .HasDefaultValue(DateTimeOffset.Now);
 
             modelBuilder.Entity<ServiceOrder>()
                 .Property(s => s.FinishDate)
                 .HasDefaultValue(null);
 
-            //Tabela Comments
+            // chave estrangeira 1/N
+            modelBuilder.Entity<ServiceOrder>()
+                .HasOne(s => s.Customer)
+                .WithMany(e => e.ServiceOrders)
+                .IsRequired();
+
+            modelBuilder.Entity<ServiceOrder>()
+                .HasMany(s => s.Comments)
+                .WithOne(e => e.ServiceOrder)
+                .HasForeignKey(e => e.ServiceOrderId)
+                .IsRequired();
+
+            // Comentarios
             modelBuilder.Entity<Comment>()
                 .ToTable("comments");
 
@@ -96,19 +107,12 @@ namespace OsDsII.api.Data
                 .Property(c => c.SendDate)
                 .HasDefaultValue(DateTimeOffset.Now);
 
-            //chave estrangeira 1/N
-            modelBuilder.Entity<ServiceOrder>()
-                .HasOne(s => s.Customer)
-                .WithMany(e => e.ServiceOrders)
-                .HasForeignKey(o => o.CustomerId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            //Chave estrangeira
+            // chave estrangeira
             modelBuilder.Entity<Comment>()
                 .HasOne(c => c.ServiceOrder)
                 .WithMany(e => e.Comments)
                 .HasForeignKey(e => e.ServiceOrderId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .IsRequired();
         }
     }
 }
